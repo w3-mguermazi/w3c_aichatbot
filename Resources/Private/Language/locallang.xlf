@@ -24,6 +24,8 @@
 
                     Your response must be ONLY a JSON object with one key: "keywords".
                     - "keywords" should be a string containing the essential keywords of the query.
+                    - you can also replace some words with their synonyms to improve the search.
+                    - you can replace misspelled words with the correct spelling.
 
                     Now, analyze the following user query:
                 </source>

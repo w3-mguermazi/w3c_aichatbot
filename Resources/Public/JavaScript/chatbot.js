@@ -1,4 +1,20 @@
 document.addEventListener('DOMContentLoaded', function () {
+    const fab = document.getElementById('w3c-ai-chatbot-fab');
+    const chatWindow = document.getElementById('w3c-ai-chat-wrapper');
+    const closeBtn = document.getElementById('w3c-ai-chat-close');
+
+    if (fab) {
+        fab.addEventListener('click', () => {
+            chatWindow.classList.toggle('hidden');
+        });
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            chatWindow.classList.add('hidden');
+        });
+    }
+
     const chatbotContainer = document.getElementById('chatbot-container');
     if (!chatbotContainer) {
         return;
@@ -33,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
         formData.append('tx_w3caichatbot_chatbotajax[action]', 'ask');
         formData.append('tx_w3caichatbot_chatbotajax[controller]', 'Chatbot');
 
-        fetch(`/index.php?id=${pageId}&type=999`, {
+        fetch(`/index.php?id=${pageId}&type=2999`, {
             method: 'POST',
             body: formData
         })
@@ -41,7 +57,9 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(data => {
             // Update bot message with actual answer
             loadingElement.innerHTML = data.answer;
-            displaySolrResults(data.solrResults);
+            if (solrResultsContainer) {
+                displaySolrResults(data.solrResults);
+            }
         })
         .catch(error => {
             console.error('Error:', error);
@@ -59,6 +77,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function displaySolrResults(results) {
+        if (!solrResultsContainer) {
+            return;
+        }
         solrResultsContainer.innerHTML = ''; // Clear previous results
 
         if (!results || results.length === 0) {

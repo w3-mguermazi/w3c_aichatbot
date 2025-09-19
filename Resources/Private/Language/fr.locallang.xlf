@@ -29,6 +29,8 @@
 
                     Your response must be ONLY a JSON object with one key: "keywords".
                     - "keywords" should be a string containing the essential keywords of the query.
+                    - you can also replace some words with their synonyms to improve the search.
+                    - you can replace misspelled words with the correct spelling.
 
                     Now, analyze the following user query:
                 </source>
@@ -37,6 +39,8 @@
 
                     Votre réponse doit être UNIQUEMENT un objet JSON avec une clé : "keywords".
                     - "keywords" doit être une chaîne de caractères contenant les mots-clés essentiels de la requête.
+                    - vous pouvez également remplacer certains mots par leurs synonymes pour améliorer la recherche.
+                    - vous pouvez corriger les mots mal orthographiés.
 
                     Maintenant, analysez la requête utilisateur suivante :
                 </target>

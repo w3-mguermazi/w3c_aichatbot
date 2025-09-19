@@ -1,4 +1,12 @@
-<div id="w3c-ai-chat-wrapper">
+<div id="w3c-ai-chatbot-fab" class="w3c-ai-chatbot-fab">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="36px" height="36px"><path d="M0 0h24v24H0z" fill="none"/><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+</div>
+
+<div id="w3c-ai-chat-wrapper" class="w3c-ai-chat-window hidden">
+    <div class="w3c-ai-chat-header">
+        <span>Chatbot</span>
+        <button id="w3c-ai-chat-close" class="w3c-ai-chat-close-btn">&times;</button>
+    </div>
     <div id="chatbot-container" data-page-id="{currentPageUid}">
         <div id="chatbot-messages"></div>
         <div id="chatbot-input-container">
@@ -6,8 +14,10 @@
             <button id="chatbot-send">Send</button>
         </div>
     </div>
-    <div id="solr-results-container">
-        <h2>Search Results</h2>
-        <div id="solr-results"></div>
-    </div>
+    <f:if condition="{settings.layout} != 1">
+        <div id="solr-results-container">
+            <h2>Search Results</h2>
+            <div id="solr-results"></div>
+        </div>
+    </f:if>
 </div>

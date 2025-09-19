@@ -56,23 +56,13 @@ class AiChatbotService
 
         $this->logger->info('Refined search', [
             'question' => $question,
-            'keywords' => $refinedSearch['keywords'],
-            'filters' => $refinedSearch['filters']
+            'keywords' => $refinedSearch['keywords']
         ]);
 
         // Step 2: Build and execute the Solr query based on the refined search
         $solrCore = 'core_' . strtolower($siteLanguage->getHreflang());
         $solrUrl = self::SOLR_ENDPOINT . $solrCore . '/select?q=' . urlencode($refinedSearch['keywords']);
-
-        if (!empty($refinedSearch['filters'])) {
-            foreach ($refinedSearch['filters'] as $field => $value) {
-                if ($field === 'year') {
-                    $solrUrl .= '&fq=' . urlencode('yearmonth_stringM:*' . $value . '*');
-                } else {
-                    $solrUrl .= '&fq=' . urlencode($field . ':' . $value);
-                }
-            }
-        }
+        
         $client = new Client();
         $results = [];
         try {
@@ -113,7 +103,7 @@ class AiChatbotService
 
     private function refineQuestion(string $question): array
     {
-        $defaultResponse = ['filters' => [], 'keywords' => $question];
+        $defaultResponse = ['keywords' => $question];
 
         if (!$this->aiConnector) {
             return $defaultResponse;
@@ -129,7 +119,6 @@ class AiChatbotService
 
             if (json_last_error() === JSON_ERROR_NONE && isset($decoded['keywords'])) {
                 return [
-                    'filters' => $decoded['filters'] ?? [],
                     'keywords' => $decoded['keywords']
                 ];
             }
@@ -137,30 +126,5 @@ class AiChatbotService
 
         // Fallback to default if refinement fails
         return $defaultResponse;
-    }
-
-    public function getFacetsWithOptions(SiteLanguage $siteLanguage): array
-    {
-        $solrCore = 'core_' . strtolower($siteLanguage->getHreflang());
-        $solrUrl = self::SOLR_ENDPOINT . $solrCore . '/select?q=*:*&facet=true&facet.field=category&facet.field=type&rows=0';
-        $client = new Client();
-        $facets = [];
-
-        try {
-            $response = $client->get($solrUrl);
-            $solrData = json_decode((string)$response->getBody(), true);
-            if (isset($solrData['facet_counts']['facet_fields'])) {
-                foreach ($solrData['facet_counts']['facet_fields'] as $facetField => $facetValues) {
-                    $facets[$facetField] = [];
-                    for ($i = 0; $i < count($facetValues); $i += 2) {
-                        $facets[$facetField][$facetValues[$i]] = $facetValues[$i + 1];
-                    }
-                }
-            }
-        } catch (GuzzleException $e) {
-            // Handle exception
-        }
-
-        return $facets;
     }
 }

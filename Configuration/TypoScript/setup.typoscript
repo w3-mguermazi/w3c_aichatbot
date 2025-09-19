@@ -1,6 +1,12 @@
-chatbot_page = PAGE
-chatbot_page.typeNum = 2999
-chatbot_page.config {
+plugin.tx_w3caichatbot_chatbot {
+    settings {
+        layout = 1
+    }
+}
+
+chatbot_ajax = PAGE
+chatbot_ajax.typeNum = 2999
+chatbot_ajax.config {
     disableAllHeaderCode = 1
     additionalHeaders.10.header = Content-type:application/json
     xhtml_cleaning = 0
@@ -17,4 +23,4 @@ lib.chatbot {
   vendorName = W3code
 }
 
-chatbot_page.10 < lib.chatbot
+chatbot_ajax.10 < lib.chatbot
