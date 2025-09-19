@@ -1,0 +1,16 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  W3code\W3cAichatbot\:
+    resource: '../Classes/*'
+    exclude:
+    - '../Classes/Domain/Model/*'
+
+  W3code\W3cAichatbot\Service\AiChatbotService:
+    public: true
+    arguments:
+      $aiConnectorFactory: '@W3code\W3cAiconnector\Service\AiConnectorFactory'
+      $languageServiceFactory: '@TYPO3\CMS\Core\Localization\LanguageServiceFactory'

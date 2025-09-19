@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+    <file source-language="en" target-language="fr" datatype="plaintext" original="messages" date="2024-01-01T12:00:00Z" product-name="w3c_aichatbot">
+        <header/>
+        <body>
+            <trans-unit id="prompt_prefix">
+                <source>Based on the following search results, please provide a comprehensive answer to the user's question: </source>
+                <target>En se basant sur les résultats de recherche suivants, veuillez fournir une réponse complète à la question de l'utilisateur : </target>
+            </trans-unit>
+            <trans-unit id="search_results_label">
+                <source>Search Results:</source>
+                <target>Résultats de recherche :</target>
+            </trans-unit>
+            <trans-unit id="ai_error_message">
+                <source>This is a placeholder answer for '</source>
+                <target>Ceci est une réponse de substitution pour '</target>
+            </trans-unit>
+            <trans-unit id="solr_results_count_prefix">
+                <source>'. Found </source>
+                <target>'. Trouvé </target>
+            </trans-unit>
+            <trans-unit id="solr_results_count_suffix">
+                <source> results in Solr, but could not get a response from the AI.</source>
+                <target> résultats dans Solr, mais n'a pas pu obtenir de réponse de l'IA.</target>
+            </trans-unit>
+            <trans-unit id="refinement_prompt">
+                <source>
+                    You are a search query analysis assistant. Your task is to analyze the user's query and simplified keywords.
+
+                    Your response must be ONLY a JSON object with one key: "keywords".
+                    - "keywords" should be a string containing the essential keywords of the query.
+
+                    Now, analyze the following user query:
+                </source>
+                <target>
+                    Vous êtes un assistant d'analyse de requêtes de recherche. Votre tâche est d'analyser la requête de l'utilisateur et d'en extraire des mots-clés simplifiés.
+
+                    Votre réponse doit être UNIQUEMENT un objet JSON avec une clé : "keywords".
+                    - "keywords" doit être une chaîne de caractères contenant les mots-clés essentiels de la requête.
+
+                    Maintenant, analysez la requête utilisateur suivante :
+                </target>
+            </trans-unit>
+            <trans-unit id="refinement_error">
+                <source>Could not refine the search query. Performing a standard search.</source>
+                <target>Impossible d'affiner la requête de recherche. Exécution d'une recherche standard.</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

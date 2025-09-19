@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+    <file source-language="en" datatype="plaintext" original="messages" date="2024-01-01T12:00:00Z" product-name="w3c_aichatbot">
+        <header/>
+        <body>
+            <trans-unit id="prompt_prefix">
+                <source>Based on the following search results, please provide a comprehensive answer to the user's question: </source>
+            </trans-unit>
+            <trans-unit id="search_results_label">
+                <source>Search Results:</source>
+            </trans-unit>
+            <trans-unit id="ai_error_message">
+                <source>This is a placeholder answer for '</source>
+            </trans-unit>
+            <trans-unit id="solr_results_count_prefix">
+                <source>'. Found </source>
+            </trans-unit>
+            <trans-unit id="solr_results_count_suffix">
+                <source> results in Solr, but could not get a response from the AI.</source>
+            </trans-unit>
+            <trans-unit id="refinement_prompt">
+                <source>
+                    You are a search query analysis assistant. Your task is to analyze the user's query and simplified keywords.
+
+                    Your response must be ONLY a JSON object with one key: "keywords".
+                    - "keywords" should be a string containing the essential keywords of the query.
+
+                    Now, analyze the following user query:
+                </source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

@@ -1,0 +1,2 @@
+# cat=general; type=options[gemini,openai,ollama,claude,mistral,cohere,deepl,custom]; label=AI Provider: Select the AI provider to use.
+provider = gemini

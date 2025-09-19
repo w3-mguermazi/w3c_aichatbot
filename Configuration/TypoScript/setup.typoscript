@@ -1,0 +1,20 @@
+chatbot_page = PAGE
+chatbot_page.typeNum = 2999
+chatbot_page.config {
+    disableAllHeaderCode = 1
+    additionalHeaders.10.header = Content-type:application/json
+    xhtml_cleaning = 0
+    admPanel = 0
+    debug = 0
+    no_cache = 1
+}
+
+lib.chatbot = USER
+lib.chatbot {
+  userFunc = TYPO3\CMS\Extbase\Core\Bootstrap->run
+  extensionName = W3cAichatbot
+  pluginName = ChatbotAjax
+  vendorName = W3code
+}
+
+chatbot_page.10 < lib.chatbot

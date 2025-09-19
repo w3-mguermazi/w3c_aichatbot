@@ -1,0 +1,60 @@
+<?php
+declare(strict_types=1);
+
+namespace W3code\W3cAichatbot\Controller;
+
+use Psr\Http\Message\ResponseInterface;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use W3code\W3cAichatbot\Service\AiChatbotService;
+use TYPO3\CMS\Core\Page\PageRenderer;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Http\ServerRequest;
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
+
+/**
+ * This file is part of the "w3c_aichatbot" Extension for TYPO3 CMS.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE.txt file that was distributed with this source code.
+ */
+class ChatbotController extends ActionController
+{
+    private AiChatbotService $aiChatbotService;
+
+    public function __construct(AiChatbotService $aiChatbotService)
+    {
+        $this->aiChatbotService = $aiChatbotService;
+    }
+
+    /**
+     * index action
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function indexAction(): ResponseInterface
+    {
+        $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
+        $pageRenderer->addJsFile('EXT:w3c_aichatbot/Resources/Public/JavaScript/chatbot.js');
+        $pageRenderer->addCssFile('EXT:w3c_aichatbot/Resources/Public/Css/chatbot.css');
+
+        $pageArguments = $this->request->getAttribute('routing');
+        $pageId = $pageArguments->getPageId();
+
+        $this->view->assign('currentPageUid', $pageId);
+        return $this->htmlResponse();
+    }
+
+    /**
+     * ask action
+     *
+     * @param string $question
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function askAction(string $question): ResponseInterface
+    {
+        $siteLanguage = $this->request->getAttribute('language');
+
+        $response = $this->aiChatbotService->getResponse($question, $siteLanguage);
+        return $this->jsonResponse(json_encode($response));
+    }
+}

@@ -1,0 +1,35 @@
+{
+    "name": "w3code/w3c-aichatbot",
+    "description": "Chatbot using AI and vectorial database index",
+    "type": "typo3-cms-extension",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Mehdi Guermazi",
+            "email": "mehdi.guermazi@w3code.tn"
+        }
+    ],
+    "require": {
+        "typo3/cms-core": "^12.4 || ^13.4",
+        "w3code/w3c-aiconnector": "@dev || dev-main",
+        "league/commonmark" : "^2.3",
+        "apache-solr-for-typo3/solr": "^12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "W3code\\W3cAichatbot\\": "Classes/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "typo3/class-alias-loader": true,
+            "typo3/cms-composer-installers": true
+        },
+        "sort-packages": true
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "w3c_aichatbot"
+        }
+    }
+}
