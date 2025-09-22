@@ -110,6 +110,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // 2. On convertit le contenu TOTAL en HTML et on met à jour le DOM
                 // La conversion du tout garantit que les blocs Markdown (listes, code) sont toujours corrects.
                 botMessageElement.innerHTML = marked.parse(fullMarkdownContent);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
             };
 
             // 3. S'exécute lorsque le flux se termine (ou en cas d'erreur)
