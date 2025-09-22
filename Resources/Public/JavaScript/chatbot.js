@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const fab = document.getElementById('w3c-ai-chatbot-fab');
     const chatWindow = document.getElementById('w3c-ai-chat-wrapper');
-    const closeBtn = document.getElementById('w3c-ai-chat-close');
+    const chatHeader = document.querySelector('.w3c-ai-chat-header');
 
     if (fab) {
         fab.addEventListener('click', () => {
@@ -9,8 +9,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
+    if (chatHeader) {
+        chatHeader.addEventListener('click', () => {
             chatWindow.classList.add('hidden');
         });
     }
@@ -25,12 +25,24 @@ document.addEventListener('DOMContentLoaded', function () {
     const chatMessages = document.getElementById('chatbot-messages');
     const solrResultsContainer = document.getElementById('solr-results');
 
-    sendButton.addEventListener('click', sendMessage);
-    chatInput.addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
-    });
+    let stream = window.stream;
+
+    if (!stream) {
+        sendButton.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    }else{
+        sendButton.addEventListener('click', sendMessageStream);
+        chatInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendMessageStream();
+            }
+        });
+    }
+    
 
     function sendMessage() {
         const question = chatInput.value;
@@ -65,6 +77,51 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Error:', error);
             loadingElement.innerText = 'Sorry, something went wrong.';
         });
+    }
+
+    async function sendMessageStream() {
+        const question = chatInput.value;
+        if (question.trim() === '') {
+            return;
+        }
+
+        appendMessage('user', question);
+        chatInput.value = '';
+
+        // Créez le conteneur pour la réponse du bot
+        const botMessageElement = appendMessage('bot', '...'); // Ajout d'un indicateur de chargement
+        let fullMarkdownContent = ''; // Variable pour accumuler le texte
+
+        // Construisez l'URL pour la requête GET
+        const url = new URL(`/index.php?id=${pageId}&type=2999`, window.location.origin);
+        url.searchParams.append('tx_w3caichatbot_chatbotajax[question]', question);
+        url.searchParams.append('tx_w3caichatbot_chatbotajax[action]', 'askStream');
+        url.searchParams.append('tx_w3caichatbot_chatbotajax[controller]', 'Chatbot');
+
+        try {
+            const eventSource = new EventSource(url.toString());
+
+            // 1. S'exécute chaque fois qu'un message (un "chunk") est reçu
+            eventSource.onmessage = (event) => {
+                // EventSource a déjà extrait le contenu de "data: ". On a juste à le parser.
+                const textChunk = JSON.parse(event.data);
+                fullMarkdownContent += textChunk;
+
+                // 2. On convertit le contenu TOTAL en HTML et on met à jour le DOM
+                // La conversion du tout garantit que les blocs Markdown (listes, code) sont toujours corrects.
+                botMessageElement.innerHTML = marked.parse(fullMarkdownContent);
+            };
+
+            // 3. S'exécute lorsque le flux se termine (ou en cas d'erreur)
+            eventSource.onerror = (error) => {
+                console.error("EventSource failed:", error);
+                eventSource.close(); // On ferme la connexion
+            };
+
+        } catch (error) {
+            console.error('Error:', error);
+            botMessageElement.innerText = 'Désolé, une erreur est survenue.';
+        }
     }
 
     function appendMessage(sender, message) {

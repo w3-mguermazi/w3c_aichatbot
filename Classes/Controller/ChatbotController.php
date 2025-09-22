@@ -8,6 +8,7 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use W3code\W3cAichatbot\Service\AiChatbotService;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Http\ImmediateResponseException;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 
@@ -35,6 +36,7 @@ class ChatbotController extends ActionController
     {
         $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
         $pageRenderer->addJsFile('EXT:w3c_aichatbot/Resources/Public/JavaScript/chatbot.js');
+        $pageRenderer->addJsFile('https://cdn.jsdelivr.net/npm/marked/marked.min.js');
         $pageRenderer->addCssFile('EXT:w3c_aichatbot/Resources/Public/Css/chatbot.css');
 
         $pageArguments = $this->request->getAttribute('routing');
@@ -56,5 +58,36 @@ class ChatbotController extends ActionController
 
         $response = $this->aiChatbotService->getResponse($question, $siteLanguage);
         return $this->jsonResponse(json_encode($response));
+    }
+    
+    /**
+     * ask action
+     *
+     * @param string $question
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function askStreamAction(string $question): never
+    {
+        $siteLanguage = $this->request->getAttribute('language');
+
+        $generator = $this->aiChatbotService->getStreamedResponse($question, $siteLanguage);
+
+        header('Content-Type: text/event-stream; charset=utf-8');
+        header('Cache-Control: no-cache');
+        header('Connection: keep-alive');
+        header('X-Accel-Buffering: no');
+
+        foreach ($generator as $textChunk) {
+            // Format the output for Server-Sent Events
+            echo "data: " . json_encode($textChunk) . "\n\n";
+
+            // Flush the output buffers to send the data to the browser immediately
+            if (ob_get_level() > 0) {
+                ob_flush();
+            }
+            flush();
+        }
+
+        exit;
     }
 }

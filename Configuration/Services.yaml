@@ -14,3 +14,4 @@ services:
     arguments:
       $aiConnectorFactory: '@W3code\W3cAiconnector\Service\AiConnectorFactory'
       $languageServiceFactory: '@TYPO3\CMS\Core\Localization\LanguageServiceFactory'
+      $configurationManager: '@TYPO3\CMS\Extbase\Configuration\ConfigurationManager'

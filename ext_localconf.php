@@ -25,11 +25,11 @@ use TYPO3\CMS\Core\Log\Writer\FileWriter;
         'W3cAichatbot',
         'ChatbotAjax',
         [
-            ChatbotController::class => 'ask'
+            ChatbotController::class => 'ask,askStream'
         ],
         // non-cacheable actions
         [
-            ChatbotController::class => 'ask'
+            ChatbotController::class => 'ask,askStream'
         ]
     );
 

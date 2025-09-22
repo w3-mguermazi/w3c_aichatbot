@@ -20,7 +20,7 @@
     position: fixed;
     bottom: 20px;
     right: 20px;
-    width: 400px;
+    width: 600px;
     max-width: 90vw;
     height: 80vh;
     max-height: 80vh;
@@ -46,6 +46,7 @@
     justify-content: space-between;
     align-items: center;
     font-weight: bold;
+    cursor: pointer;
 }
 
 .w3c-ai-chat-close-btn {

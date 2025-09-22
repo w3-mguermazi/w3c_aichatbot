@@ -1,6 +1,7 @@
 plugin.tx_w3caichatbot_chatbot {
     settings {
         layout = 1
+        stream = 1
     }
 }
 
@@ -8,7 +9,6 @@ chatbot_ajax = PAGE
 chatbot_ajax.typeNum = 2999
 chatbot_ajax.config {
     disableAllHeaderCode = 1
-    additionalHeaders.10.header = Content-type:application/json
     xhtml_cleaning = 0
     admPanel = 0
     debug = 0
