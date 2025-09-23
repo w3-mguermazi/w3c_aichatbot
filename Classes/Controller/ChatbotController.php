@@ -38,8 +38,8 @@ class ChatbotController extends ActionController
     public function indexAction(): ResponseInterface
     {
         $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
+        $pageRenderer->addJsLibrary('marked', 'https://cdn.jsdelivr.net/npm/marked/marked.min.js');
         $pageRenderer->addJsFile('EXT:w3c_aichatbot/Resources/Public/JavaScript/chatbot.js');
-        $pageRenderer->addJsFile('https://cdn.jsdelivr.net/npm/marked/marked.min.js');
         $pageRenderer->addCssFile('EXT:w3c_aichatbot/Resources/Public/Css/chatbot.css');
 
         $pageArguments = $this->request->getAttribute('routing');
