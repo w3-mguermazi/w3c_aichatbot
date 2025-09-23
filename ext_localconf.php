@@ -55,4 +55,5 @@ use TYPO3\CMS\Core\Log\Writer\FileWriter;
             ],
         ],
     ];
+    
 })();

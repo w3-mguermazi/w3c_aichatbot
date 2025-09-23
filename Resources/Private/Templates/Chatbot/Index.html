@@ -10,7 +10,12 @@
         <button id="w3c-ai-chat-close" class="w3c-ai-chat-close-btn">&times;</button>
     </div>
     <div id="chatbot-container" data-page-id="{currentPageUid}">
-        <div id="chatbot-messages"></div>
+        <div id="chatbot-messages">
+            <f:for each="{history}" as="chat">
+                <div class="chatbot-message user-message">{chat.question}</div>
+                <div class="chatbot-message bot-message"><f:format.raw>{chat.answer}</f:format.raw></div>
+            </f:for>
+        </div>
         <div id="chatbot-input-container">
             <input type="text" id="chatbot-input" placeholder="Ask me anything...">
             <button id="chatbot-send">Send</button>

@@ -21,3 +21,5 @@ services:
     arguments:
       $aiChatbotService: '@W3code\W3cAichatbot\Service\AiChatbotService'
       $logManager: '@TYPO3\CMS\Core\Log\LogManagerInterface'
+      $chatHistoryRepository: '@W3code\W3cAichatbot\Domain\Repository\ChatHistoryRepository'
+      $frontendUserRepository: '@W3code\W3cAichatbot\Domain\Repository\FrontendUserRepository'
