@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (fab) {
         fab.addEventListener('click', () => {
             chatWindow.classList.toggle('hidden');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         });
     }
 

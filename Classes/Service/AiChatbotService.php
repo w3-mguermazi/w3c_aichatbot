@@ -56,7 +56,7 @@ class AiChatbotService
         $results = $this->getSolrResults($refinedSearch, $siteLanguage);
 
         // Step 3: Summarize the results with the second AI call
-        $summaryPrompt = $this->languageService->sL('LLL:EXT:w3c_aichatbot/Resources/Private/Language/locallang.xlf:prompt_prefix') . htmlspecialchars($question) . "\n\n";
+        $summaryPrompt = $this->languageService->sL('LLL:EXT:w3c_aichatbot/Resources/Private/Language/locallang.xlf:prompt_prefix') . ' ' . htmlspecialchars($question) . "\n\n";
         $summaryPrompt .= $this->languageService->sL('LLL:EXT:w3c_aichatbot/Resources/Private/Language/locallang.xlf:search_results_label') . "\n";
         foreach ($results as $result) {
             $summaryPrompt .= "- titre: " . ($result['title'] ?? '') . " - contenu: " . ($result['content'] ?? '') . " - URL: " . ($result['url'] ?? '') . "\n";
