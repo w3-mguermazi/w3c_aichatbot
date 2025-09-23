@@ -47,4 +47,12 @@ use TYPO3\CMS\Core\Log\Writer\FileWriter;
             ],
         ],
     ];
+    $GLOBALS['TYPO3_CONF_VARS']['LOG']['W3code']['W3cAichatbot']['Controller']['ChatbotController']['writerConfiguration'] = [
+        // Configure for INFO level and higher
+        LogLevel::INFO => [
+            FileWriter::class => [
+                'logFile' => Environment::getVarPath() . '/log/w3c_aichatbot_info.log',
+            ],
+        ],
+    ];
 })();

@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const chatMessages = document.getElementById('chatbot-messages');
     const solrResultsContainer = document.getElementById('solr-results');
 
-    let stream = window.stream;
+    let stream = window.aichatbotStream;
 
     if (!stream) {
         sendButton.addEventListener('click', sendMessage);

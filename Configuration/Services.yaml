@@ -15,3 +15,9 @@ services:
       $aiConnectorFactory: '@W3code\W3cAiconnector\Service\AiConnectorFactory'
       $languageServiceFactory: '@TYPO3\CMS\Core\Localization\LanguageServiceFactory'
       $configurationManager: '@TYPO3\CMS\Extbase\Configuration\ConfigurationManager'
+
+  W3code\W3cAichatbot\Controller\ChatbotController:
+    public: true
+    arguments:
+      $aiChatbotService: '@W3code\W3cAichatbot\Service\AiChatbotService'
+      $logManager: '@TYPO3\CMS\Core\Log\LogManagerInterface'

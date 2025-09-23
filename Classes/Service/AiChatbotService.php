@@ -5,8 +5,6 @@ namespace W3code\W3cAichatbot\Service;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Response as GuzzleResponse;
-use GuzzleHttp\Psr7\FnStream;
 use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use W3code\W3cAiconnector\Service\AiConnectorFactory;
@@ -16,8 +14,6 @@ use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use League\CommonMark\CommonMarkConverter;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
-use Psr\Http\Message\ResponseInterface;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AiChatbotService
 {
@@ -46,21 +42,15 @@ class AiChatbotService
                 'W3cAichatbot',
                 'Chatbot'
             );
+        $this->setAiConnector();
     }
 
     public function getResponse(string $question, SiteLanguage $siteLanguage): array
     {
         $this->languageService = $this->languageServiceFactory->createFromSiteLanguage($siteLanguage);
 
-        $this->setAiConnector();
-
         // Step 1: Refine the user's question with the first AI call
         $refinedSearch = $this->refineQuestion($question, $this->aiConnector);
-
-        $this->logger->info('Refined search', [
-            'question' => $question,
-            'keywords' => $refinedSearch['keywords']
-        ]);
 
         // Step 2: Build and execute the Solr query based on the refined search
         $results = $this->getSolrResults($refinedSearch, $siteLanguage);
@@ -69,7 +59,7 @@ class AiChatbotService
         $summaryPrompt = $this->languageService->sL('LLL:EXT:w3c_aichatbot/Resources/Private/Language/locallang.xlf:prompt_prefix') . htmlspecialchars($question) . "\n\n";
         $summaryPrompt .= $this->languageService->sL('LLL:EXT:w3c_aichatbot/Resources/Private/Language/locallang.xlf:search_results_label') . "\n";
         foreach ($results as $result) {
-            $summaryPrompt .= "- " . ($result['title'] ?? '') . ": " . ($result['content'] ?? '') . "\n";
+            $summaryPrompt .= "- titre: " . ($result['title'] ?? '') . " - contenu: " . ($result['content'] ?? '') . " - URL: " . ($result['url'] ?? '') . "\n";
         }
 
         $finalResponse = $this->aiConnector->process($summaryPrompt);
@@ -95,10 +85,6 @@ class AiChatbotService
     {
         $defaultResponse = ['keywords' => $question];
 
-        if (!$this->aiConnector) {
-            return $defaultResponse;
-        }
-
         $refinementPrompt = $this->languageService->sL('LLL:EXT:w3c_aichatbot/Resources/Private/Language/locallang.xlf:refinement_prompt') . ' ' . $question;
         $jsonResponse = $this->aiConnector->process($refinementPrompt);
 
@@ -108,6 +94,7 @@ class AiChatbotService
             $decoded = json_decode($jsonString, true);
 
             if (json_last_error() === JSON_ERROR_NONE && isset($decoded['keywords'])) {
+                $this->logger->info('Refined search', ['question' => $question, 'keywords' => $decoded['keywords']]);
                 return [
                     'keywords' => $decoded['keywords']
                 ];
@@ -122,15 +109,8 @@ class AiChatbotService
     {
         $this->languageService = $this->languageServiceFactory->createFromSiteLanguage($siteLanguage);
 
-        $this->setAiConnector();
-
         // Step 1: Refine the user's question with the first AI call
-        $refinedSearch = $this->refineQuestion($question, $this->aiConnector);
-
-        $this->logger->info('Refined search', [
-            'question' => $question,
-            'keywords' => $refinedSearch['keywords']
-        ]);
+        $refinedSearch = $this->refineQuestion($question);
 
         // Step 2: Build and execute the Solr query based on the refined search
         $results = $this->getSolrResults($refinedSearch, $siteLanguage);
@@ -139,7 +119,7 @@ class AiChatbotService
         $summaryPrompt = $this->languageService->sL('LLL:EXT:w3c_aichatbot/Resources/Private/Language/locallang.xlf:prompt_prefix') . htmlspecialchars($question) . "\n\n";
         $summaryPrompt .= $this->languageService->sL('LLL:EXT:w3c_aichatbot/Resources/Private/Language/locallang.xlf:search_results_label') . "\n";
         foreach ($results as $result) {
-            $summaryPrompt .= "- " . ($result['title'] ?? '') . ": " . ($result['content'] ?? '') . "\n";
+            $summaryPrompt .= "- titre: " . ($result['title'] ?? '') . " - contenu: " . ($result['content'] ?? '') . " - URL: " . ($result['url'] ?? '') . "\n";
         }
 
         yield from $this->aiConnector->streamProcess($summaryPrompt);
@@ -147,17 +127,9 @@ class AiChatbotService
 
     protected function setAiConnector(): void
     {
-        // Chercher le service AI configuré
-        // Récupérer la configuration de l'extension W3cAiconnector
-        $extConfAiConnector = GeneralUtility::makeInstance(ExtensionConfiguration::class)
-            ->get('w3c_aiconnector');
-        // Récupérer la configuration de l'extension W3cAichatbot
-        $extConfAiChatbot = GeneralUtility::makeInstance(ExtensionConfiguration::class)
-            ->get('w3c_aichatbot');
-        $provider = $extConfAiConnector['provider'] ?? '';
-        if (isset($extConfAiChatbot['provider']) && !empty($extConfAiChatbot['provider'])) {
-            $provider = $extConfAiChatbot['provider'];
-        }
+        $extConfAiConnector = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('w3c_aiconnector');
+        $extConfAiChatbot = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('w3c_aichatbot');
+        $provider = $extConfAiChatbot['provider'] ?? $extConfAiConnector['provider'] ?? '';
         $this->aiConnector = $this->aiConnectorFactory->create($provider);
     }
 
@@ -172,8 +144,10 @@ class AiChatbotService
             $response = $client->get($solrUrl);
             $solrData = json_decode((string)$response->getBody(), true);
             $results = $solrData['response']['docs'] ?? [];
+            $variantIds = array_map(fn($result) => $result['variantId'] ?? null, $results);
+            $this->logger->info('Solr Results', ['variantIds' => $variantIds]);
         } catch (GuzzleException $e) {
-            // Handle exception, maybe log it
+            $this->logger->error('Solr Error', ['error' => $e->getMessage()]);
         }
 
         return $results;

@@ -8,9 +8,8 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use W3code\W3cAichatbot\Service\AiChatbotService;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Http\ImmediateResponseException;
-use TYPO3\CMS\Core\Http\ServerRequest;
-use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
+use Psr\Log\LoggerInterface;
+use TYPO3\CMS\Core\Log\LogManagerInterface;
 
 /**
  * This file is part of the "w3c_aichatbot" Extension for TYPO3 CMS.
@@ -21,10 +20,14 @@ use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 class ChatbotController extends ActionController
 {
     private AiChatbotService $aiChatbotService;
+    protected LoggerInterface $logger;
 
-    public function __construct(AiChatbotService $aiChatbotService)
-    {
+    public function __construct(
+        AiChatbotService $aiChatbotService,
+        LogManagerInterface $logManager
+    ) {
         $this->aiChatbotService = $aiChatbotService;
+        $this->logger = $logManager->getLogger(static::class);
     }
 
     /**
@@ -61,7 +64,7 @@ class ChatbotController extends ActionController
     }
     
     /**
-     * ask action
+     * ask stream action
      *
      * @param string $question
      * @return \Psr\Http\Message\ResponseInterface
@@ -77,8 +80,10 @@ class ChatbotController extends ActionController
         header('Connection: keep-alive');
         header('X-Accel-Buffering: no');
 
+        $response = '';
         foreach ($generator as $textChunk) {
             // Format the output for Server-Sent Events
+            $response .= $textChunk;
             echo "data: " . json_encode($textChunk) . "\n\n";
 
             // Flush the output buffers to send the data to the browser immediately
@@ -87,6 +92,7 @@ class ChatbotController extends ActionController
             }
             flush();
         }
+        $this->logger->info('AI final response', ['response' => $response]);
 
         exit;
     }

@@ -1,6 +1,6 @@
 plugin.tx_w3caichatbot_chatbot {
     settings {
-        layout = 1
+        layout = 0
         stream = 1
     }
 }
