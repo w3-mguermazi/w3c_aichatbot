@@ -64,6 +64,8 @@ class AiChatbotService
 
         $finalResponse = $this->aiConnector->process($summaryPrompt);
 
+        $finalResponse = $this->truncateGracefully($finalResponse);
+
         if (empty($finalResponse)) {
             // Fallback response if AI fails
             $finalResponse = $this->languageService->sL('LLL:EXT:w3c_aichatbot/Resources/Private/Language/locallang.xlf:ai_error_message') . htmlspecialchars($question)
@@ -123,6 +125,22 @@ class AiChatbotService
         }
 
         yield from $this->aiConnector->streamProcess($summaryPrompt);
+    }
+
+    public function truncateGracefully(string $text): string
+    {
+        if (empty($text)) {
+            return '';
+        }
+        // A simple heuristic: if the text does not end with a newline, it's likely been truncated.
+        if (substr($text, -1) !== "\n") {
+            $lastNewlinePos = strrpos($text, "\n");
+            if ($lastNewlinePos !== false) {
+                // Return text up to the last newline, effectively removing the incomplete last line.
+                return substr($text, 0, $lastNewlinePos);
+            }
+        }
+        return $text;
     }
 
     protected function setAiConnector(): void

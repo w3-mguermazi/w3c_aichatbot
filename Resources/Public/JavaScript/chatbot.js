@@ -43,7 +43,21 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-    
+
+    function truncateGracefully(text) {
+        if (!text) {
+            return '';
+        }
+        // A simple heuristic: if the text does not end with a newline, it's likely been truncated.
+        if (text.slice(-1) !== "\n") {
+            const lastNewlinePos = text.lastIndexOf("\n");
+            if (lastNewlinePos !== -1) {
+                // Return text up to the last newline, effectively removing the incomplete last line.
+                return text.substring(0, lastNewlinePos);
+            }
+        }
+        return text;
+    }
 
     function sendMessage() {
         const question = chatInput.value;
@@ -117,6 +131,9 @@ document.addEventListener('DOMContentLoaded', function () {
             // 3. S'exécute lorsque le flux se termine (ou en cas d'erreur)
             eventSource.onerror = (error) => {
                 console.error("EventSource failed:", error);
+                const finalContent = truncateGracefully(fullMarkdownContent);
+                botMessageElement.innerHTML = marked.parse(finalContent);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
                 eventSource.close(); // On ferme la connexion
             };
 

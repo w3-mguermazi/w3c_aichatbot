@@ -93,7 +93,7 @@ class ChatbotController extends ActionController
         $siteLanguage = $this->request->getAttribute('language');
 
         $response = $this->aiChatbotService->getResponse($question, $siteLanguage);
-        $this->saveHistory($question, $response['result']);
+        $this->saveHistory($question, $this->aiChatbotService->truncateGracefully($response['result'] ?? ''));
 
         return $this->jsonResponse(json_encode($response));
     }
@@ -128,7 +128,7 @@ class ChatbotController extends ActionController
             flush();
         }
         $this->logger->info('AI final response', ['response' => $response]);
-        $this->saveHistory($question, $response);
+        $this->saveHistory($question, $this->aiChatbotService->truncateGracefully($response));
 
         exit;
     }
