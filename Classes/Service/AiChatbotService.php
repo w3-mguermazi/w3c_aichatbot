@@ -73,7 +73,7 @@ class AiChatbotService
                 . $this->languageService->sL('LLL:EXT:w3c_aichatbot/Resources/Private/Language/locallang.xlf:solr_results_count_suffix');
         }
 
-        $this->logger->info('AI final response', ['response' => $finalResponse]);
+        $this->logger->info('AI final response', ['prompt' => $question, 'completion' => $finalResponse]);
 
         $converter = new CommonMarkConverter();
 

@@ -127,7 +127,7 @@ class ChatbotController extends ActionController
             }
             flush();
         }
-        $this->logger->info('AI final response', ['response' => $response]);
+        $this->logger->info('AI final response', ['prompt' => $question, 'completion' => $response]);
         $this->saveHistory($question, $this->aiChatbotService->truncateGracefully($response));
 
         exit;
