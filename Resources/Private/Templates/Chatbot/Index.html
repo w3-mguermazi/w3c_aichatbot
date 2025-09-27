@@ -5,8 +5,15 @@
 </div>
 
 <div id="w3c-ai-chat-wrapper" class="w3c-ai-chat-window hidden">
+    <div id="w3c-aichatbot-localization" style="display: none;"
+         data-loading="<f:translate key='loading' />"
+         data-error-message="<f:translate key='errorMessage' />"
+         data-your-opinion="<f:translate key='yourOpinion' />"
+         data-thank-you="<f:translate key='thankYou' />"
+         data-no-results="<f:translate key='noResults' />"
+    ></div>
     <div class="w3c-ai-chat-header">
-        <span>Chatbot</span>
+        <span><f:translate key='chatbot' /></span>
         <button id="w3c-ai-chat-close" class="w3c-ai-chat-close-btn">&times;</button>
     </div>
     <div id="chatbot-container" data-page-id="{currentPageUid}">
@@ -17,13 +24,13 @@
             </f:for>
         </div>
         <div id="chatbot-input-container">
-            <input type="text" id="chatbot-input" placeholder="Ask me anything...">
-            <button id="chatbot-send">Send</button>
+            <input type="text" id="chatbot-input" placeholder="<f:translate key='askMeAnything' />">
+            <button id="chatbot-send"><f:translate key='send' /></button>
         </div>
     </div>
     <f:if condition="{settings.layout} != 1 && {settings.stream} != 1">
         <div id="solr-results-container">
-            <h2>Search Results</h2>
+            <h2><f:translate key='searchResults' /></h2>
             <div id="solr-results"></div>
         </div>
     </f:if>

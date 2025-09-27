@@ -2,6 +2,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const fab = document.getElementById('w3c-ai-chatbot-fab');
     const chatWindow = document.getElementById('w3c-ai-chat-wrapper');
     const chatHeader = document.querySelector('.w3c-ai-chat-header');
+    const localizationContainer = document.getElementById('w3c-aichatbot-localization');
+
+    const localization = {
+        loading: localizationContainer.dataset.loading,
+        errorMessage: localizationContainer.dataset.errorMessage,
+        yourOpinion: localizationContainer.dataset.yourOpinion,
+        thankYou: localizationContainer.dataset.thankYou,
+        noResults: localizationContainer.dataset.noResults
+    };
 
     if (fab) {
         fab.addEventListener('click', () => {
@@ -35,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 sendMessage();
             }
         });
-    }else{
+    } else {
         sendButton.addEventListener('click', sendMessageStream);
         chatInput.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
@@ -48,11 +57,9 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!text) {
             return '';
         }
-        // A simple heuristic: if the text does not end with a newline, it's likely been truncated.
         if (text.slice(-1) !== "\n") {
             const lastNewlinePos = text.lastIndexOf("\n");
             if (lastNewlinePos !== -1) {
-                // Return text up to the last newline, effectively removing the incomplete last line.
                 return text.substring(0, lastNewlinePos);
             }
         }
@@ -68,8 +75,7 @@ document.addEventListener('DOMContentLoaded', function () {
         appendMessage('user', question);
         chatInput.value = '';
 
-        // Add loading indicator for bot message
-        const loadingElement = appendMessage('bot', '...');
+        const loadingElement = appendMessage('bot', localization.loading);
 
         const formData = new FormData();
         formData.append('tx_w3caichatbot_chatbotajax[question]', question);
@@ -82,15 +88,15 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .then(response => response.json())
         .then(data => {
-            // Update bot message with actual answer
             loadingElement.innerHTML = data.answer;
+            appendRatingUI(loadingElement, question, data.answer);
             if (solrResultsContainer) {
                 displaySolrResults(data.solrResults);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            loadingElement.innerText = 'Sorry, something went wrong.';
+            loadingElement.innerText = localization.errorMessage;
         });
     }
 
@@ -103,11 +109,9 @@ document.addEventListener('DOMContentLoaded', function () {
         appendMessage('user', question);
         chatInput.value = '';
 
-        // Créez le conteneur pour la réponse du bot
-        const botMessageElement = appendMessage('bot', '...'); // Ajout d'un indicateur de chargement
-        let fullMarkdownContent = ''; // Variable pour accumuler le texte
+        const botMessageElement = appendMessage('bot', localization.loading);
+        let fullMarkdownContent = '';
 
-        // Construisez l'URL pour la requête GET
         const url = new URL(`/index.php?id=${pageId}&type=2999`, window.location.origin);
         url.searchParams.append('tx_w3caichatbot_chatbotajax[question]', question);
         url.searchParams.append('tx_w3caichatbot_chatbotajax[action]', 'askStream');
@@ -116,50 +120,96 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
             const eventSource = new EventSource(url.toString());
 
-            // 1. S'exécute chaque fois qu'un message (un "chunk") est reçu
             eventSource.onmessage = (event) => {
-                // EventSource a déjà extrait le contenu de "data: ". On a juste à le parser.
-                const textChunk = JSON.parse(event.data);
-                fullMarkdownContent += textChunk;
-
-                // 2. On convertit le contenu TOTAL en HTML et on met à jour le DOM
-                // La conversion du tout garantit que les blocs Markdown (listes, code) sont toujours corrects.
-                botMessageElement.innerHTML = marked.parse(fullMarkdownContent);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+                try {
+                    const data = JSON.parse(event.data);
+                    if (typeof data === 'string') {
+                        fullMarkdownContent += data;
+                        botMessageElement.innerHTML = marked.parse(fullMarkdownContent);
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
+                } catch (e) {
+                    console.log("Could not parse message data, probably end of stream or custom event.", event.data);
+                }
             };
 
-            // 3. S'exécute lorsque le flux se termine (ou en cas d'erreur)
             eventSource.onerror = (error) => {
                 console.error("EventSource failed:", error);
                 const finalContent = truncateGracefully(fullMarkdownContent);
                 botMessageElement.innerHTML = marked.parse(finalContent);
+                appendRatingUI(botMessageElement, question, finalContent);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
-                eventSource.close(); // On ferme la connexion
+                eventSource.close();
             };
 
         } catch (error) {
             console.error('Error:', error);
-            botMessageElement.innerText = 'Désolé, une erreur est survenue.';
+            botMessageElement.innerText = localization.errorMessage;
         }
     }
 
     function appendMessage(sender, message) {
         const messageElement = document.createElement('div');
         messageElement.classList.add('chatbot-message', sender + '-message');
-        messageElement.innerText = message;
+        if (sender === 'bot') {
+            messageElement.innerHTML = message;
+        } else {
+            messageElement.innerText = message;
+        }
         chatMessages.appendChild(messageElement);
         chatMessages.scrollTop = chatMessages.scrollHeight;
         return messageElement;
+    }
+
+    function appendRatingUI(messageElement, question, answer) {
+        const ratingContainer = document.createElement('div');
+        ratingContainer.classList.add('rating-container');
+        ratingContainer.innerHTML = localization.yourOpinion;
+
+        for (let i = 1; i <= 5; i++) {
+            const star = document.createElement('span');
+            star.classList.add('rating-star');
+            star.innerHTML = '&#9733;';
+            star.dataset.rating = i;
+            star.addEventListener('click', () => {
+                rateAnswer(question, answer, i, ratingContainer);
+            });
+            ratingContainer.appendChild(star);
+        }
+        messageElement.appendChild(ratingContainer);
+    }
+
+    function rateAnswer(question, answer, rating, ratingContainer) {
+        const formData = new FormData();
+        formData.append('tx_w3caichatbot_chatbotajax[question]', question);
+        formData.append('tx_w3caichatbot_chatbotajax[answer]', answer);
+        formData.append('tx_w3caichatbot_chatbotajax[rating]', rating);
+        formData.append('tx_w3caichatbot_chatbotajax[action]', 'rate');
+        formData.append('tx_w3caichatbot_chatbotajax[controller]', 'Chatbot');
+
+        fetch(`/index.php?id=${pageId}&type=2999`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                ratingContainer.innerHTML = localization.thankYou;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
     }
 
     function displaySolrResults(results) {
         if (!solrResultsContainer) {
             return;
         }
-        solrResultsContainer.innerHTML = ''; // Clear previous results
+        solrResultsContainer.innerHTML = '';
 
         if (!results || results.length === 0) {
-            solrResultsContainer.innerHTML = '<p>Aucun résultat trouvé.</p>';
+            solrResultsContainer.innerHTML = `<p>${localization.noResults}</p>`;
             return;
         }
 
@@ -169,12 +219,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const title = document.createElement('h3');
             const link = document.createElement('a');
-            link.href = result.url; // Assuming there is a URL in the result
+            link.href = result.url;
             link.textContent = result.title;
             title.appendChild(link);
 
             const content = document.createElement('p');
-            // Substring to show a snippet, adjust length as needed
             content.textContent = result.content ? result.content.substring(0, 250) + '...' : '';
 
             resultElement.appendChild(title);

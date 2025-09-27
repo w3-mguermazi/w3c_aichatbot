@@ -133,6 +133,20 @@ class ChatbotController extends ActionController
         exit;
     }
 
+    /**
+     * rate action
+     *
+     * @param string $question
+     * @param string $answer
+     * @param int $rating
+     * @return ResponseInterface
+     */
+    public function rateAction(string $question, string $answer, int $rating): ResponseInterface
+    {
+        $this->logger->info('Chat rated', ['prompt' => $question, 'completion' => $answer, 'rating' => $rating]);
+        return $this->jsonResponse(json_encode(['success' => true]));
+    }
+
     private function saveHistory(string $question, string $answer): void
     {
         if ($this->feUser->isLoggedIn()) {

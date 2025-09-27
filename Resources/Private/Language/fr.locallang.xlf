@@ -3,6 +3,42 @@
     <file source-language="en" target-language="fr" datatype="plaintext" original="messages" date="2024-01-01T12:00:00Z" product-name="w3c_aichatbot">
         <header/>
         <body>
+            <trans-unit id="loading">
+                <source>...</source>
+                <target>...</target>
+            </trans-unit>
+            <trans-unit id="errorMessage">
+                <source>Sorry, something went wrong.</source>
+                <target>Désolé, une erreur est survenue.</target>
+            </trans-unit>
+            <trans-unit id="yourOpinion">
+                <source>Your opinion: </source>
+                <target>Votre avis : </target>
+            </trans-unit>
+            <trans-unit id="thankYou">
+                <source>Thank you for your feedback!</source>
+                <target>Merci pour votre avis !</target>
+            </trans-unit>
+            <trans-unit id="noResults">
+                <source>No results found.</source>
+                <target>Aucun résultat trouvé.</target>
+            </trans-unit>
+            <trans-unit id="chatbot">
+                <source>Chatbot</source>
+                <target>Chatbot</target>
+            </trans-unit>
+            <trans-unit id="askMeAnything">
+                <source>Ask me anything...</source>
+                <target>Posez-moi une question...</target>
+            </trans-unit>
+            <trans-unit id="send">
+                <source>Send</source>
+                <target>Envoyer</target>
+            </trans-unit>
+            <trans-unit id="searchResults">
+                <source>Search Results</source>
+                <target>Résultats de recherche</target>
+            </trans-unit>
             <trans-unit id="prompt_prefix">
                 <source>
                     # ROLE AND OBJECTIVE
